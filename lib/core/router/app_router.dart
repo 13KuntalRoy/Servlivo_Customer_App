@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/booking/presentation/bloc/booking_event.dart';
+import '../../features/splash/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/onboarding_screen.dart';
 import '../../features/auth/presentation/screens/otp_screen.dart';
@@ -44,6 +45,7 @@ import '../../features/payment/presentation/bloc/payment_bloc.dart';
 class AppRoutes {
   AppRoutes._();
 
+  static const splash = '/';
   static const onboarding = '/onboarding';
   static const login = '/login';
   static const phoneLogin = '/phone-login';
@@ -81,13 +83,28 @@ class AppRouter {
   AppRouter._();
 
   static GoRouter config(AuthBloc authBloc) {
+    // Stays true until the splash screen calls context.go() to leave
+    bool splashShowing = true;
+
     return GoRouter(
-      initialLocation: AppRoutes.home,
+      initialLocation: AppRoutes.splash,
       debugLogDiagnostics: true,
       redirect: (BuildContext context, GoRouterState state) {
         final authState = authBloc.state;
         final isAuthenticated = authState is AuthAuthenticated;
         final loc = state.matchedLocation;
+
+        // Always let splash through — it handles its own navigation
+        if (loc == AppRoutes.splash) {
+          splashShowing = true;
+          return null;
+        }
+
+        // Splash just navigated away — allow it
+        if (splashShowing) {
+          splashShowing = false;
+          return null;
+        }
 
         final authRoutes = [
           AppRoutes.onboarding,
@@ -109,6 +126,12 @@ class AppRouter {
       },
       refreshListenable: _AuthBlocListenable(authBloc),
       routes: [
+        // ── Splash ──────────────────────────────────────────────────────────
+        GoRoute(
+          path: AppRoutes.splash,
+          builder: (_, __) => const SplashScreen(),
+        ),
+
         // ── Auth routes ─────────────────────────────────────────────────────
         GoRoute(
           path: AppRoutes.onboarding,
