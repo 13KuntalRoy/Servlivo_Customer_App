@@ -1,388 +1,400 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
-
-  @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
-}
-
-class _OnboardingScreenState extends State<OnboardingScreen> {
-  final PageController _controller = PageController();
-  int _currentPage = 0;
-
-  static const _pages = [
-    _PageData(
-      image: 'assets/images/onboarding1.png',
-      bgColor: Color(0xFFFFEDE3),
-      badge: 'TRUSTED BY HOMES. LOVED FOR EVENTS',
-      titleStart: 'From ',
-      titleHighlight: 'chores',
-      titleEnd: ' to cheers —\nwe handle it all',
-      subtitle:
-          'Book verified women professionals for cleaning, care, chef services, and celebrations in just a few taps.',
-      featureBar: '⚡  OTP start  •  Live tracking  •  Free replacement',
-      stats: [
-        _Stat(icon: Icons.star_rounded, value: '4.9', label: 'avg rating'),
-        _Stat(icon: Icons.people_alt_rounded, value: '6,000+', label: 'families served'),
-        _Stat(icon: Icons.access_time_rounded, value: '<2 min', label: 'to book'),
-      ],
-    ),
-    _PageData(
-      image: 'assets/images/onboarding2.png',
-      bgColor: Color(0xFFE8F8F4),
-      badge: 'EXPERT CHEFS AT YOUR DOOR',
-      titleStart: 'Home-cooked ',
-      titleHighlight: 'meals',
-      titleEnd: ',\nprofessional taste',
-      subtitle:
-          'From daily meals to special occasions — our certified chefs bring restaurant-quality food right to your home.',
-      featureBar: '👨‍🍳  Certified chefs  •  Fresh ingredients  •  Custom menu',
-      stats: [
-        _Stat(icon: Icons.verified_rounded, value: '100%', label: 'certified'),
-        _Stat(icon: Icons.restaurant_rounded, value: '50+', label: 'cuisines'),
-        _Stat(icon: Icons.thumb_up_rounded, value: '98%', label: 'satisfaction'),
-      ],
-    ),
-  ];
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _next() {
-    if (_currentPage < _pages.length - 1) {
-      _controller.nextPage(
-        duration: const Duration(milliseconds: 350),
-        curve: Curves.easeInOut,
-      );
-    } else {
-      context.go(AppRoutes.login);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // ── Top bar ───────────────────────────────────────────────────────
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
+      backgroundColor: Colors.transparent,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFFFF7F1),
+              Color(0xFFFFFCFA),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _TopBar(
+                  onSkip: () => context.go(AppRoutes.home),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(10, 12, 10, 16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFE4D6),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(color: const Color(0xFFFFD2BC)),
+                  ),
+                  child: Column(
                     children: [
-                      Image.asset('assets/images/logo.png', width: 28, height: 28),
-                      const SizedBox(width: 6),
-                      const Text(
-                        'Servlivo',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+                      Container(
+                        height: 282,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFEEDF),
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              child: DecoratedBox(
+                                decoration: const BoxDecoration(
+                                  gradient: RadialGradient(
+                                    center: Alignment.topCenter,
+                                    radius: 1.2,
+                                    colors: [
+                                      Color(0xFFFFF6ED),
+                                      Color(0xFFFEE3CF),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned.fill(
+                              child: Image.asset(
+                                'assets/images/onboarding2.png',
+                                fit: BoxFit.cover,
+                                alignment: Alignment.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(color: const Color(0xFFFFC4AB)),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.verified_rounded,
+                                size: 16, color: AppColors.primary),
+                            SizedBox(width: 6),
+                            Text(
+                              'TRUSTED BY HOMES. LOVED FOR EVENTS',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primary,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                  TextButton(
+                ),
+                const SizedBox(height: 16),
+                RichText(
+                  text: const TextSpan(
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 28,
+                      height: 1.05,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
+                    ),
+                    children: [
+                      TextSpan(text: 'From '),
+                      TextSpan(
+                        text: 'chores',
+                        style: TextStyle(color: AppColors.primary),
+                      ),
+                      TextSpan(text: ' to '),
+                      TextSpan(
+                        text: 'cheers',
+                        style: TextStyle(color: AppColors.primary),
+                      ),
+                      TextSpan(text: ' - we\nhandle it all'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Book verified women professionals for cleaning, care, chef services, and celebrations in just a few taps.',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 13,
+                    height: 1.55,
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 11,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF3D9),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFFFD888)),
+                  ),
+                  child: const Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 8,
+                    runSpacing: 6,
+                    children: [
+                      _FeatureChip(label: 'OTP start'),
+                      _FeatureDot(),
+                      _FeatureChip(label: 'Live tracking'),
+                      _FeatureDot(),
+                      _FeatureChip(label: 'Free replacement'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+                const Row(
+                  children: [
+                    Expanded(
+                      child: _StatCard(
+                        icon: Icons.star_rounded,
+                        iconColor: Color(0xFFFF8A1F),
+                        value: '4.9',
+                        label: 'avg rating',
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: _StatCard(
+                        icon: Icons.people_alt_rounded,
+                        iconColor: AppColors.primary,
+                        value: '6,000+',
+                        label: 'families served',
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: _StatCard(
+                        icon: Icons.access_time_rounded,
+                        iconColor: AppColors.secondary,
+                        value: '<2 min',
+                        label: 'to book',
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Center(
+                  child: Container(
+                    width: 34,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton(
                     onPressed: () => context.go(AppRoutes.login),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
                     child: const Text(
-                      'Skip',
+                      'Get Started  ->',
                       style: TextStyle(
                         fontFamily: 'Poppins',
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-
-            // ── Pages ─────────────────────────────────────────────────────────
-            Expanded(
-              child: PageView.builder(
-                controller: _controller,
-                itemCount: _pages.length,
-                onPageChanged: (i) => setState(() => _currentPage = i),
-                itemBuilder: (_, i) => _OnboardingPageWidget(data: _pages[i]),
-              ),
-            ),
-
-            // ── Bottom controls ───────────────────────────────────────────────
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 4, 24, 20),
-              child: Column(
-                children: [
-                  // Dots
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      _pages.length,
-                      (i) => AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: i == _currentPage ? 20 : 7,
-                        height: 7,
-                        decoration: BoxDecoration(
-                          color: i == _currentPage
-                              ? AppColors.primary
-                              : AppColors.divider,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-
-                  // CTA button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton(
-                      onPressed: _next,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        _currentPage < _pages.length - 1
-                            ? 'Next  →'
-                            : 'Get Started  →',
-                        style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Sign In
-                  TextButton(
-                    onPressed: () => context.go(AppRoutes.login),
-                    child: const Text(
-                      'Sign In',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
-// ── Page widget ──────────────────────────────────────────────────────────────
+class _TopBar extends StatelessWidget {
+  final VoidCallback onSkip;
 
-class _OnboardingPageWidget extends StatelessWidget {
-  final _PageData data;
-  const _OnboardingPageWidget({required this.data});
+  const _TopBar({required this.onSkip});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Illustration card
-          Container(
-            width: double.infinity,
-            height: 260,
-            decoration: BoxDecoration(
-              color: data.bgColor,
-              borderRadius: BorderRadius.circular(24),
-            ),
-            clipBehavior: Clip.hardEdge,
-            child: Image.asset(
-              data.image,
-              fit: BoxFit.contain,
-              alignment: Alignment.bottomCenter,
-            ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFE2D3),
+            borderRadius: BorderRadius.circular(999),
           ),
-          const SizedBox(height: 20),
-
-          // Badge
-          Text(
-            data.badge,
-            style: const TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              color: AppColors.primary,
-              letterSpacing: 1.0,
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          // Title with highlight
-          RichText(
-            text: TextSpan(
-              style: const TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 26,
-                fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
-                height: 1.25,
-              ),
-              children: [
-                TextSpan(text: data.titleStart),
-                TextSpan(
-                  text: data.titleHighlight,
-                  style: const TextStyle(color: AppColors.primary),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset('assets/images/logo.png', width: 20, height: 20),
+              const SizedBox(width: 8),
+              const Text(
+                'Servlivo',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary,
                 ),
-                TextSpan(text: data.titleEnd),
-              ],
-            ),
+              ),
+            ],
           ),
-          const SizedBox(height: 10),
-
-          // Subtitle
-          Text(
-            data.subtitle,
-            style: const TextStyle(
+        ),
+        TextButton(
+          onPressed: onSkip,
+          style: TextButton.styleFrom(
+            foregroundColor: AppColors.textSecondary,
+            backgroundColor: Colors.white.withValues(alpha: 0.85),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(999),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+          ),
+          child: const Text(
+            'Skip',
+            style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 13,
-              fontWeight: FontWeight.w400,
-              color: AppColors.textSecondary,
-              height: 1.6,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 14),
+        ),
+      ],
+    );
+  }
+}
 
-          // Feature bar
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFFDE7),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFFFE082)),
-            ),
-            child: Text(
-              data.featureBar,
-              style: const TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF7A5C00),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
+class _FeatureChip extends StatelessWidget {
+  final String label;
 
-          // Stats row
-          Row(
-            children: data.stats
-                .map(
-                  (s) => Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: AppColors.divider),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x08000000),
-                            blurRadius: 8,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Icon(s.icon, size: 22, color: AppColors.primary),
-                          const SizedBox(height: 6),
-                          Text(
-                            s.value,
-                            style: const TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            s.label,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 10,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
-          const SizedBox(height: 8),
-        ],
+  const _FeatureChip({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      label,
+      style: const TextStyle(
+        fontFamily: 'Poppins',
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: Color(0xFF5E4B1C),
       ),
     );
   }
 }
 
-// ── Data models ──────────────────────────────────────────────────────────────
+class _FeatureDot extends StatelessWidget {
+  const _FeatureDot();
 
-class _PageData {
-  final String image;
-  final Color bgColor;
-  final String badge;
-  final String titleStart;
-  final String titleHighlight;
-  final String titleEnd;
-  final String subtitle;
-  final String featureBar;
-  final List<_Stat> stats;
-
-  const _PageData({
-    required this.image,
-    required this.bgColor,
-    required this.badge,
-    required this.titleStart,
-    required this.titleHighlight,
-    required this.titleEnd,
-    required this.subtitle,
-    required this.featureBar,
-    required this.stats,
-  });
+  @override
+  Widget build(BuildContext context) {
+    return const Text(
+      '•',
+      style: TextStyle(
+        fontFamily: 'Poppins',
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+        color: Color(0xFF5E4B1C),
+      ),
+    );
+  }
 }
 
-class _Stat {
+class _StatCard extends StatelessWidget {
   final IconData icon;
+  final Color iconColor;
   final String value;
   final String label;
 
-  const _Stat({required this.icon, required this.value, required this.label});
+  const _StatCard({
+    required this.icon,
+    required this.iconColor,
+    required this.value,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFF0E8E2)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x12000000),
+            blurRadius: 16,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: iconColor, size: 22),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 10,
+              height: 1.2,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

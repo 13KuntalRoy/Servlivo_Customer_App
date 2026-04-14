@@ -14,18 +14,30 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
   @override
   Future<Map<String, dynamic>> getHomeData() async {
     try {
-      // Parallel fetch: categories + popular services
+      // Public content loads first; bookings are optional so guest entry still works.
       final results = await Future.wait([
         dio.get(Endpoints.categories),
-        dio.get(Endpoints.catalogServices,
-            queryParameters: {'sort': 'popular', 'limit': 10}),
-        dio.get(Endpoints.bookings, queryParameters: {'status': 'ongoing'}),
+        dio.get(
+          Endpoints.catalogServices,
+          queryParameters: {'sort': 'popular', 'limit': 10},
+        ),
       ]);
+
+      Map<String, dynamic>? bookingsData;
+      try {
+        final bookingsResponse = await dio.get(
+          Endpoints.bookings,
+          queryParameters: {'status': 'ongoing'},
+        );
+        bookingsData = bookingsResponse.data as Map<String, dynamic>?;
+      } catch (_) {
+        bookingsData = null;
+      }
 
       return {
         'categories': results[0].data,
         'popular_services': results[1].data,
-        'ongoing_bookings': results[2].data,
+        'ongoing_bookings': bookingsData ?? const {'data': []},
       };
     } on DioException catch (e) {
       final data = e.response?.data;

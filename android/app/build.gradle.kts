@@ -31,7 +31,7 @@ android {
 
     defaultConfig {
         applicationId = "com.servlivo.servlivo_customer_app"
-        minSdk = 21  // flutter_secure_storage minimum
+        minSdk = flutter.minSdkVersion  // flutter_secure_storage minimum
         targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName

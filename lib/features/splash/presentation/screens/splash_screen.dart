@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -57,67 +58,73 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: FadeTransition(
-          opacity: _fadeAnim,
-          child: ScaleTransition(
-            scale: _scaleAnim,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Logo — drop your logo.png into assets/images/
-                Image.asset(
-                  'assets/images/logo.png',
-                  width: 200,
-                  height: 200,
-                  fit: BoxFit.contain,
-                ),
-                const SizedBox(height: 20),
-                // App name
-                const Text(
-                  'Servlivo',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 32,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                // Tagline
-                const Text(
-                  'Home Services, Simplified',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondary,
-                    letterSpacing: 0.3,
-                  ),
-                ),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+        systemNavigationBarColor: Color(0xFFF7F1E6),
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: RadialGradient(
+              center: Alignment.topCenter,
+              radius: 1.25,
+              colors: [
+                Color(0xFFF9F5EB),
+                Color(0xFFF4ECDD),
               ],
+              stops: [0.0, 1.0],
             ),
           ),
-        ),
-      ),
-      // Subtle loading indicator at the bottom
-      bottomNavigationBar: const Padding(
-        padding: EdgeInsets.only(bottom: 48),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.5,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+          child: SafeArea(
+            bottom: false,
+            child: Center(
+              child: FadeTransition(
+                opacity: _fadeAnim,
+                child: ScaleTransition(
+                  scale: _scaleAnim,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.asset(
+                        'assets/images/logo.png',
+                        width: 170,
+                        height: 170,
+                        fit: BoxFit.contain,
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Servlivo',
+                        style: TextStyle(
+                          fontFamily: 'serif',
+                          fontSize: 34,
+                          height: 1.0,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF263B35),
+                          letterSpacing: -0.25,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Home Services, Simplified.',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                          height: 1.0,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFF727272),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

@@ -115,8 +115,11 @@ class AppRouter {
           AppRoutes.forgotPassword,
         ];
         final isOnAuthRoute = authRoutes.any((r) => loc == r || loc.startsWith(r));
+        final guestAllowedRoutes = [AppRoutes.home];
+        final isGuestAllowedRoute =
+            guestAllowedRoutes.any((r) => loc == r || loc.startsWith(r));
 
-        if (!isAuthenticated && !isOnAuthRoute) {
+        if (!isAuthenticated && !isOnAuthRoute && !isGuestAllowedRoute) {
           return AppRoutes.login;
         }
         if (isAuthenticated && isOnAuthRoute) {
