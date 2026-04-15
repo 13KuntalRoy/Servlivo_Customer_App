@@ -169,12 +169,26 @@ class _PrimeScreenState extends State<PrimeScreen> {
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
+                                  if (plan.tagline.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 4),
+                                      child: Text(
+                                        plan.tagline,
+                                        style: TextStyle(
+                                          color: isPopular ? Colors.white70 : AppColors.textSecondary,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ),
+                                  const SizedBox(height: 8),
                                   Text(
-                                    '₹${plan.price.toStringAsFixed(0)} / ${plan.durationDays} days',
+                                    plan.priceMonthly == 0
+                                        ? 'FREE'
+                                        : '₹${plan.priceMonthly.toStringAsFixed(0)} / month',
                                     style: TextStyle(
                                       color: isPopular ? Colors.amber : AppColors.primary,
-                                      fontSize: 14,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                   const SizedBox(height: 12),

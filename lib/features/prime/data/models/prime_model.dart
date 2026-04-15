@@ -3,18 +3,22 @@ import '../../domain/entities/prime_entity.dart';
 class PrimePlanModel extends PrimePlanEntity {
   const PrimePlanModel({
     required super.id,
+    required super.tier,
     required super.name,
-    required super.price,
-    required super.durationDays,
+    required super.tagline,
+    required super.priceMonthly,
+    required super.priceYearly,
     required super.benefits,
   });
 
   factory PrimePlanModel.fromJson(Map<String, dynamic> json) => PrimePlanModel(
         id: json['id'] as String,
+        tier: json['tier'] as String? ?? 'free',
         name: json['name'] as String,
-        price: (json['price'] as num?)?.toDouble() ?? 0,
-        durationDays: (json['duration_days'] as int?) ?? 0,
-        benefits: ((json['benefits'] as List?) ?? []).cast<String>(),
+        tagline: json['tagline'] as String? ?? '',
+        priceMonthly: (json['price_monthly'] as num?)?.toDouble() ?? 0,
+        priceYearly: (json['price_yearly'] as num?)?.toDouble() ?? 0,
+        benefits: ((json['features'] as List?) ?? []).cast<String>(),
       );
 }
 

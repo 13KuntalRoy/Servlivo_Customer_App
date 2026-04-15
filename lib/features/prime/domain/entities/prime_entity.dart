@@ -2,21 +2,25 @@ import 'package:equatable/equatable.dart';
 
 class PrimePlanEntity extends Equatable {
   final String id;
+  final String tier;
   final String name;
-  final double price;
-  final int durationDays;
+  final String tagline;
+  final double priceMonthly;
+  final double priceYearly;
   final List<String> benefits;
 
   const PrimePlanEntity({
     required this.id,
+    required this.tier,
     required this.name,
-    required this.price,
-    required this.durationDays,
+    required this.tagline,
+    required this.priceMonthly,
+    required this.priceYearly,
     required this.benefits,
   });
 
   @override
-  List<Object> get props => [id, name, price];
+  List<Object> get props => [id, tier, name, priceMonthly, priceYearly];
 }
 
 class PrimeMembershipEntity extends Equatable {
