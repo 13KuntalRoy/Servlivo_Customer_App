@@ -52,6 +52,9 @@ dependencies:
   firebase_messaging: ^15.2.10
   flutter_local_notifications: ^17.2.0
 
+  # Icons
+  font_awesome_flutter: ^10.7.0
+
   # Utilities
   intl: ^0.19.0
   timeago: ^3.6.0

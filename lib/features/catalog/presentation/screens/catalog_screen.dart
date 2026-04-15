@@ -170,7 +170,53 @@ class _CatalogScreenState extends State<CatalogScreen>
 
           return Column(
             children: [
-              if (_tabController != null && _subcategories.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                child: TextField(
+                  controller: _searchCtrl,
+                  decoration: InputDecoration(
+                    hintText: 'Search for services...',
+                    prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+                    suffixIcon: _searchCtrl.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              _searchCtrl.clear();
+                              setState(() {});
+                              if (_tabController != null &&
+                                  _subcategories.isNotEmpty) {
+                                context.read<CatalogCubit>().loadServices(
+                                    _subcategories[_tabController!.index].id);
+                              }
+                            },
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: Colors.white,
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: AppColors.primary),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  ),
+                  onChanged: (val) {
+                    setState(() {});
+                    if (val.trim().isEmpty) {
+                      if (_tabController != null && _subcategories.isNotEmpty) {
+                        context.read<CatalogCubit>().loadServices(
+                            _subcategories[_tabController!.index].id);
+                      }
+                    } else if (val.trim().length >= 2) {
+                      context.read<CatalogCubit>().searchServices(query: val);
+                    }
+                  },
+                ),
+              ),
+              if (_tabController != null && _subcategories.isNotEmpty && _searchCtrl.text.isEmpty)
                 TabBar(
                   controller: _tabController,
                   isScrollable: true,

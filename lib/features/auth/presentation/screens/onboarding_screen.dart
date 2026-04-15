@@ -66,9 +66,9 @@ class OnboardingScreen extends StatelessWidget {
                             ),
                             Positioned.fill(
                               child: Image.asset(
-                                'assets/images/onboarding2.png',
+                                'assets/images/onboarding1.png',
                                 fit: BoxFit.cover,
-                                alignment: Alignment.center,
+                                alignment: Alignment.topCenter,
                               ),
                             ),
                           ],
