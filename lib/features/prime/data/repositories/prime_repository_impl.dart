@@ -41,7 +41,8 @@ class PrimeRepositoryImpl implements PrimeRepository {
     if (!await networkInfo.isConnected) return const Left(NetworkFailure('No internet'));
     try {
       final data = await remote.getMembership();
-      return Right(data != null ? PrimeMembershipModel.fromJson(data) : null);
+      final hasActiveMembership = data != null && data.containsKey('id');
+      return Right(hasActiveMembership ? PrimeMembershipModel.fromJson(data) : null);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     }
