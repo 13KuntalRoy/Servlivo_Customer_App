@@ -226,7 +226,10 @@ class _HomeBody extends StatelessWidget {
                   category: data.categories[i],
                   onTap: () => context.push(
                     AppRoutes.catalog,
-                    extra: {'category_id': data.categories[i].id},
+                    extra: {
+                      'category_id': data.categories[i].id,
+                      'category_name': data.categories[i].name,
+                    },
                   ),
                 ),
                 childCount: data.categories.length,

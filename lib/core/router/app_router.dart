@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+
+import '../theme/app_colors.dart';
 
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_state.dart';
@@ -186,12 +189,16 @@ class AppRouter {
             GoRoute(
               path: AppRoutes.catalog,
               builder: (_, state) {
-                final categoryId =
-                    (state.extra as Map<String, dynamic>?)?['category_id'] as String? ??
+                final extra = state.extra as Map<String, dynamic>?;
+                final categoryId = extra?['category_id'] as String? ??
                     state.uri.queryParameters['category_id'];
+                final categoryName = extra?['category_name'] as String?;
                 return BlocProvider(
                   create: (_) => sl<CatalogCubit>()..loadCategories(),
-                  child: CatalogScreen(categoryId: categoryId),
+                  child: CatalogScreen(
+                    categoryId: categoryId,
+                    categoryName: categoryName,
+                  ),
                 );
               },
             ),
@@ -388,6 +395,7 @@ class _MainShellState extends State<_MainShell> {
   }
 
   void _onTap(int index) {
+    HapticFeedback.lightImpact();
     context.go(_tabs[index]);
   }
 
@@ -397,36 +405,311 @@ class _MainShellState extends State<_MainShell> {
     final currentIndex = _indexFromLocation(location);
     return Scaffold(
       body: widget.child,
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: _FloatingNavBar(
         currentIndex: currentIndex,
         onTap: _onTap,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home',
+      ),
+    );
+  }
+}
+
+// ─── Floating Nav Bar ─────────────────────────────────────────────────────────
+
+class _NavItem {
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+
+  const _NavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+  });
+}
+
+class _FloatingNavBar extends StatelessWidget {
+  final int currentIndex;
+  final ValueChanged<int> onTap;
+
+  static const _items = [
+    _NavItem(
+      icon: Icons.home_outlined,
+      activeIcon: Icons.home_rounded,
+      label: 'Home',
+    ),
+    _NavItem(
+      icon: Icons.calendar_month_outlined,
+      activeIcon: Icons.calendar_month_rounded,
+      label: 'Bookings',
+    ),
+    _NavItem(
+      icon: Icons.grid_view_outlined,
+      activeIcon: Icons.grid_view_rounded,
+      label: 'Services',
+    ),
+    _NavItem(
+      icon: Icons.account_balance_wallet_outlined,
+      activeIcon: Icons.account_balance_wallet_rounded,
+      label: 'Wallet',
+    ),
+    _NavItem(
+      icon: Icons.person_outline_rounded,
+      activeIcon: Icons.person_rounded,
+      label: 'Profile',
+    ),
+  ];
+
+  const _FloatingNavBar({
+    required this.currentIndex,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
+    return Container(
+      color: Colors.transparent,
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Color(0x14000000),
+              blurRadius: 24,
+              offset: Offset(0, -4),
+            ),
+            BoxShadow(
+              color: Color(0x08000000),
+              blurRadius: 8,
+              offset: Offset(0, -1),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: 8,
+            bottom: bottomPadding > 0 ? bottomPadding : 12,
+            left: 8,
+            right: 8,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today_outlined),
-            activeIcon: Icon(Icons.calendar_today),
-            label: 'Bookings',
+          child: Row(
+            children: List.generate(_items.length, (i) {
+              final isCenter = i == 2;
+              final isActive = i == currentIndex;
+              return Expanded(
+                child: isCenter
+                    ? _CenterNavItem(
+                        item: _items[i],
+                        isActive: isActive,
+                        onTap: () => onTap(i),
+                      )
+                    : _RegularNavItem(
+                        item: _items[i],
+                        isActive: isActive,
+                        onTap: () => onTap(i),
+                      ),
+              );
+            }),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.grid_view_outlined),
-            activeIcon: Icon(Icons.grid_view),
-            label: 'Services',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet_outlined),
-            activeIcon: Icon(Icons.account_balance_wallet),
-            label: 'Wallet',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RegularNavItem extends StatefulWidget {
+  final _NavItem item;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const _RegularNavItem({
+    required this.item,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  @override
+  State<_RegularNavItem> createState() => _RegularNavItemState();
+}
+
+class _RegularNavItemState extends State<_RegularNavItem>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+      lowerBound: 0.85,
+      upperBound: 1.0,
+      value: 1.0,
+    );
+    _scaleAnim = _controller;
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onTapDown(_) => _controller.reverse();
+  void _onTapUp(_) => _controller.forward();
+  void _onTapCancel() => _controller.forward();
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: widget.onTap,
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      behavior: HitTestBehavior.opaque,
+      child: ScaleTransition(
+        scale: _scaleAnim,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              decoration: BoxDecoration(
+                color: widget.isActive
+                    ? AppColors.primary.withValues(alpha: 0.1)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Icon(
+                widget.isActive ? widget.item.activeIcon : widget.item.icon,
+                size: 22,
+                color: widget.isActive
+                    ? AppColors.primary
+                    : AppColors.textHint,
+              ),
+            ),
+            const SizedBox(height: 2),
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
+              style: TextStyle(
+                fontSize: 10.5,
+                fontWeight: widget.isActive
+                    ? FontWeight.w700
+                    : FontWeight.w400,
+                color: widget.isActive
+                    ? AppColors.primary
+                    : AppColors.textHint,
+              ),
+              child: Text(widget.item.label),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CenterNavItem extends StatefulWidget {
+  final _NavItem item;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const _CenterNavItem({
+    required this.item,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  @override
+  State<_CenterNavItem> createState() => _CenterNavItemState();
+}
+
+class _CenterNavItemState extends State<_CenterNavItem>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+      lowerBound: 0.88,
+      upperBound: 1.0,
+      value: 1.0,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onTapDown(_) => _controller.reverse();
+  void _onTapUp(_) => _controller.forward();
+  void _onTapCancel() => _controller.forward();
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: widget.onTap,
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      behavior: HitTestBehavior.opaque,
+      child: ScaleTransition(
+        scale: _controller,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: widget.isActive
+                      ? [AppColors.primary, const Color(0xFFFF9A5C)]
+                      : [const Color(0xFFFF8C4B), AppColors.primary],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(
+                        alpha: widget.isActive ? 0.45 : 0.3),
+                    blurRadius: widget.isActive ? 16 : 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Icon(
+                widget.isActive ? widget.item.activeIcon : widget.item.icon,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+            const SizedBox(height: 2),
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
+              style: TextStyle(
+                fontSize: 10.5,
+                fontWeight: widget.isActive
+                    ? FontWeight.w700
+                    : FontWeight.w400,
+                color: widget.isActive
+                    ? AppColors.primary
+                    : AppColors.textHint,
+              ),
+              child: Text(widget.item.label),
+            ),
+          ],
+        ),
       ),
     );
   }
