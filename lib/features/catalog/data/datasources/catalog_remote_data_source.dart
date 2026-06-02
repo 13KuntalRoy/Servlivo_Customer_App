@@ -11,7 +11,6 @@ abstract interface class CatalogRemoteDataSource {
   Future<ServiceModel> getServiceDetail(String serviceId);
   Future<List<ServiceAttributeModel>> getServiceAttributes(String serviceId);
   Future<List<ServiceModel>> searchServices({required String query, String? categoryId});
-  Future<Map<String, dynamic>> getAvailability({required String serviceId, required String date});
 }
 
 class CatalogRemoteDataSourceImpl implements CatalogRemoteDataSource {
@@ -78,21 +77,12 @@ class CatalogRemoteDataSourceImpl implements CatalogRemoteDataSource {
       final params = <String, String>{'q': query};
       if (categoryId != null) params['category_id'] = categoryId;
       final response = await _dio.get(Endpoints.catalogSearch, queryParameters: params);
-      final list = (response.data as List<dynamic>?) ?? [];
+      // Meilisearch returns an object { hits: [...] }; tolerate a bare array too.
+      final data = response.data;
+      final list = data is Map<String, dynamic>
+          ? (data['hits'] as List<dynamic>? ?? [])
+          : (data as List<dynamic>? ?? []);
       return list.map((e) => ServiceModel.fromJson(e as Map<String, dynamic>)).toList();
-    } on DioException catch (e) {
-      _handleError(e);
-    }
-  }
-
-  @override
-  Future<Map<String, dynamic>> getAvailability({required String serviceId, required String date}) async {
-    try {
-      final response = await _dio.get(
-        Endpoints.catalogAvailability,
-        queryParameters: {'service_id': serviceId, 'date': date},
-      );
-      return response.data as Map<String, dynamic>;
     } on DioException catch (e) {
       _handleError(e);
     }

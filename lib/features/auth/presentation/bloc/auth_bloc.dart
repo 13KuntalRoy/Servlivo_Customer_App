@@ -1,7 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/error/failures.dart';
 import '../../../../core/storage/secure_storage.dart';
 import '../../domain/usecases/forgot_password_usecase.dart';
+import '../../domain/usecases/get_current_user_usecase.dart';
 import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
 import '../../domain/usecases/register_usecase.dart';
@@ -23,6 +25,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final ResetPasswordUseCase _resetPassword;
   final SendPhoneOtpUseCase _sendPhoneOtp;
   final VerifyPhoneOtpUseCase _verifyPhoneOtp;
+  final GetCurrentUserUseCase _getCurrentUser;
   final SecureStorageService _storage;
 
   AuthBloc({
@@ -35,6 +38,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required ResetPasswordUseCase resetPassword,
     required SendPhoneOtpUseCase sendPhoneOtp,
     required VerifyPhoneOtpUseCase verifyPhoneOtp,
+    required GetCurrentUserUseCase getCurrentUser,
     required SecureStorageService storage,
   })  : _login = login,
         _register = register,
@@ -45,6 +49,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         _resetPassword = resetPassword,
         _sendPhoneOtp = sendPhoneOtp,
         _verifyPhoneOtp = verifyPhoneOtp,
+        _getCurrentUser = getCurrentUser,
         _storage = storage,
         super(const AuthInitial()) {
     on<AuthCheckStatusRequested>(_onCheckStatus);
@@ -64,13 +69,28 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     final hasToken = await _storage.hasAccessToken;
-    if (hasToken) {
-      // Emit a lightweight "authenticated" state with placeholder user.
-      // Real user data is loaded by HomeBloc/ProfileCubit.
-      emit(TokenPresent());
-    } else {
+    if (!hasToken) {
       emit(const AuthUnauthenticated());
+      return;
     }
+
+    // Emit a lightweight authenticated state immediately so the splash/router
+    // can proceed without waiting on the network, then hydrate the real user.
+    emit(TokenPresent());
+
+    final result = await _getCurrentUser();
+    result.fold(
+      (failure) {
+        // A token that the server rejects (and the interceptor could not
+        // refresh) means the session is no longer valid — force re-login.
+        // Network/server failures keep the optimistic TokenPresent state so
+        // the app remains usable offline and hydrates on the next request.
+        if (failure is AuthFailure) {
+          emit(const AuthUnauthenticated());
+        }
+      },
+      (user) => emit(AuthAuthenticated(user)),
+    );
   }
 
   Future<void> _onLoginRequested(

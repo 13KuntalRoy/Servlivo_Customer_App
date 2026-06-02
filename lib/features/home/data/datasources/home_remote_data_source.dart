@@ -23,13 +23,12 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
         ),
       ]);
 
-      Map<String, dynamic>? bookingsData;
+      // Backend returns the user's bookings as a JSON array (newest first);
+      // the repository picks the most relevant one to surface on home.
+      dynamic bookingsData;
       try {
-        final bookingsResponse = await dio.get(
-          Endpoints.bookings,
-          queryParameters: {'status': 'ongoing'},
-        );
-        bookingsData = bookingsResponse.data as Map<String, dynamic>?;
+        final bookingsResponse = await dio.get(Endpoints.bookings);
+        bookingsData = bookingsResponse.data;
       } catch (_) {
         bookingsData = null;
       }
@@ -37,7 +36,7 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
       return {
         'categories': results[0].data,
         'popular_services': results[1].data,
-        'ongoing_bookings': bookingsData ?? const {'data': []},
+        'ongoing_bookings': bookingsData ?? const <dynamic>[],
       };
     } on DioException catch (e) {
       final data = e.response?.data;

@@ -79,14 +79,4 @@ class CatalogRepositoryImpl implements CatalogRepository {
     }
   }
 
-  @override
-  Future<Either<Failure, Map<String, dynamic>>> getAvailability({required String serviceId, required String date}) async {
-    if (!await networkInfo.isConnected) return const Left(NetworkFailure('No internet'));
-    try {
-      final data = await remote.getAvailability(serviceId: serviceId, date: date);
-      return Right(data);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    }
-  }
 }

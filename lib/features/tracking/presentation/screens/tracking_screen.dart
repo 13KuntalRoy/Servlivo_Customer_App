@@ -2,13 +2,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../../core/api/endpoints.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../bloc/tracking_bloc.dart';
+import '../widgets/live_tracking_map.dart';
 
 class TrackingScreen extends StatelessWidget {
   final String bookingId;
@@ -33,29 +33,13 @@ class TrackingScreen extends StatelessWidget {
         return Scaffold(
           body: Stack(
             children: [
-              // Google Map
-              GoogleMap(
-                initialCameraPosition: CameraPosition(
-                  target: location != null
-                      ? LatLng(location.latitude, location.longitude)
-                      : const LatLng(20.5937, 78.9629), // India center — pans to vendor once connected
-                  zoom: location != null ? 15 : 5,
+              // Live map (OpenStreetMap tiles via flutter_map — no Google Maps)
+              Positioned.fill(
+                child: LiveTrackingMap(
+                  vendorLat: location?.latitude,
+                  vendorLon: location?.longitude,
+                  vendorName: vendorName,
                 ),
-                markers: location != null
-                    ? {
-                        Marker(
-                          markerId: const MarkerId('vendor'),
-                          position: LatLng(location.latitude, location.longitude),
-                          icon: BitmapDescriptor.defaultMarkerWithHue(
-                            BitmapDescriptor.hueOrange,
-                          ),
-                          infoWindow: InfoWindow(title: vendorName ?? 'Your Expert'),
-                        ),
-                      }
-                    : {},
-                myLocationEnabled: true,
-                myLocationButtonEnabled: false,
-                zoomControlsEnabled: false,
               ),
 
               // Status bar at top

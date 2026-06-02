@@ -11,5 +11,4 @@ abstract class PaymentRepository {
     required String razorpaySignature,
   });
   Future<Either<Failure, List<PaymentEntity>>> getTransactions();
-  Future<Either<Failure, PaymentEntity>> requestRefund(String paymentId);
 }
