@@ -36,6 +36,10 @@ abstract interface class AuthRepository {
 
   Future<Either<Failure, bool>> isLoggedIn();
 
+  /// Fetches the currently authenticated user from the backend. Used on app
+  /// startup to hydrate the real user when a stored token exists.
+  Future<Either<Failure, UserEntity>> getCurrentUser();
+
   Future<Either<Failure, void>> sendPhoneOtp({required String phone});
 
   Future<Either<Failure, UserEntity>> verifyPhoneOtp({

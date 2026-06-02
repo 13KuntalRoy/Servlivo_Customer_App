@@ -163,6 +163,26 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, UserEntity>> getCurrentUser() async {
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure('No internet connection'));
+    }
+    try {
+      final data = await remote.getProfile();
+      final user = UserModel.fromJson(data);
+      await storage.write(
+        key: SecureStorageServiceImpl.kUserId,
+        value: user.id,
+      );
+      return Right(user.toEntity());
+    } on UnauthorizedException {
+      return const Left(AuthFailure('Session expired'));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
   Future<Either<Failure, void>> sendPhoneOtp({required String phone}) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure('No internet connection'));

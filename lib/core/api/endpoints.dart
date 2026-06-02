@@ -1,8 +1,18 @@
 class Endpoints {
   Endpoints._();
 
-  static const String baseUrl = 'https://api.servlivo.com/api';
-  static const String wsBaseUrl = 'wss://api.servlivo.com/api';
+  // Overridable per environment at build time, e.g.:
+  //   flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8080/api \
+  //               --dart-define=WS_BASE_URL=ws://10.0.2.2:8080/api
+  // Defaults target production.
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'https://api.servlivo.com/api',
+  );
+  static const String wsBaseUrl = String.fromEnvironment(
+    'WS_BASE_URL',
+    defaultValue: 'wss://api.servlivo.com/api',
+  );
 
   // ── Auth (proxied to user-service /auth/*) ────────────────────────────────
   static const String register = '/auth/register';
@@ -75,7 +85,7 @@ class Endpoints {
   static const String groupBuys = '/bookings/group-buys';
 
   // ── Subscriptions (booking-service /subscriptions/*) ─────────────────────
-  static const String subscriptions = '/subscriptions/';
+  static const String subscriptions = '/subscriptions';
   static String subscriptionById(String id) => '/subscriptions/$id';
   static String pauseSubscription(String id) => '/subscriptions/$id/pause';
   static String resumeSubscription(String id) => '/subscriptions/$id/resume';
@@ -84,7 +94,7 @@ class Endpoints {
   // ── Payments (payment-service via /api/payments/*) ────────────────────────
   static const String initiatePayment = '/payments/initiate';
   static const String verifyPayment = '/payments/verify';
-  static const String transactions = '/payments/transactions/';
+  static const String transactions = '/payments/transactions';
   static const String refund = '/payments/refund';
   static const String paymentInitiate = initiatePayment;
   static String upiPayment(String bookingId) => '/payments/upi/$bookingId';
@@ -97,7 +107,7 @@ class Endpoints {
 
   // ── Reviews (review-service via /api/reviews/*) ───────────────────────────
   static const String reviews = '/reviews';
-  static const String myReviews = '/reviews/me/';
+  static const String myReviews = '/reviews/me';
   static String vendorReviews(String vendorId) => '/reviews/vendor/$vendorId';
   static String vendorReviewMetrics(String vendorId) =>
       '/reviews/vendor/$vendorId/metrics';

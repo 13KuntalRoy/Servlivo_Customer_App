@@ -10,5 +10,4 @@ abstract interface class CatalogRepository {
   Future<Either<Failure, ServiceEntity>> getServiceDetail(String serviceId);
   Future<Either<Failure, List<ServiceAttributeEntity>>> getServiceAttributes(String serviceId);
   Future<Either<Failure, List<ServiceEntity>>> searchServices({required String query, String? categoryId});
-  Future<Either<Failure, Map<String, dynamic>>> getAvailability({required String serviceId, required String date});
 }

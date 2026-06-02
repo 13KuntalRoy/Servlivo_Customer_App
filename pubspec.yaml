@@ -32,8 +32,9 @@ dependencies:
   # Network Connectivity
   connectivity_plus: ^6.0.0
 
-  # Maps & Location
-  google_maps_flutter: ^2.6.0
+  # Maps & Location (open-source: OSM tiles via flutter_map, no API key)
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.1
   geolocator: ^13.0.0
   geocoding: ^4.0.0
 

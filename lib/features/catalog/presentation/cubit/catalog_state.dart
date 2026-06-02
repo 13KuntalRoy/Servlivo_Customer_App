@@ -44,21 +44,12 @@ class ServicesLoaded extends CatalogState {
 
 class ServiceDetailLoaded extends CatalogState {
   final ServiceEntity service;
+  final List<ServiceAttributeEntity> attributes;
 
-  const ServiceDetailLoaded(this.service);
-
-  @override
-  List<Object> get props => [service];
-}
-
-class AvailabilityLoaded extends CatalogState {
-  final bool available;
-  final List<String> slots;
-
-  const AvailabilityLoaded({required this.available, required this.slots});
+  const ServiceDetailLoaded(this.service, {this.attributes = const []});
 
   @override
-  List<Object> get props => [available, slots];
+  List<Object> get props => [service, attributes];
 }
 
 class CatalogError extends CatalogState {

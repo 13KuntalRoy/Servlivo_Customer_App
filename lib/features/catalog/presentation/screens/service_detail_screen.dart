@@ -134,7 +134,7 @@ class ServiceDetailScreen extends StatelessWidget {
           );
         }
         if (state is ServiceDetailLoaded) {
-          return _DetailBody(service: state.service);
+          return _DetailBody(service: state.service, attributes: state.attributes);
         }
         return const Scaffold(
           body: Center(
@@ -148,7 +148,8 @@ class ServiceDetailScreen extends StatelessWidget {
 
 class _DetailBody extends StatelessWidget {
   final ServiceEntity service;
-  const _DetailBody({required this.service});
+  final List<ServiceAttributeEntity> attributes;
+  const _DetailBody({required this.service, this.attributes = const []});
 
   @override
   Widget build(BuildContext context) {
@@ -218,6 +219,99 @@ class _DetailBody extends StatelessWidget {
                       style: const TextStyle(
                         fontFamily: 'Poppins', fontSize: 13.5,
                         color: AppColors.textSecondary, height: 1.6)),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+
+              // ── Photo gallery (multiple images) ───────────────────────
+              if (service.images.length > 1) ...[
+                _SectionPad(
+                  child: _InfoCard(
+                    title: 'Photos',
+                    icon: Icons.photo_library_outlined,
+                    iconColor: const Color(0xFF0891B2),
+                    child: SizedBox(
+                      height: 96,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: service.images.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 10),
+                        itemBuilder: (_, i) => ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: CachedNetworkImage(
+                            imageUrl: service.images[i],
+                            width: 128, height: 96, fit: BoxFit.cover,
+                            errorWidget: (_, __, ___) => Container(
+                              width: 128, color: colors[1],
+                              child: Icon(_catIcon(service.name), color: colors[0]),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+
+              // ── Service options / attributes ──────────────────────────
+              if (attributes.isNotEmpty) ...[
+                _SectionPad(
+                  child: _InfoCard(
+                    title: 'Service options',
+                    icon: Icons.tune_rounded,
+                    iconColor: colors[0],
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: attributes.map((attr) => Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(children: [
+                              Text(
+                                attr.label.isNotEmpty ? attr.label : attr.name,
+                                style: const TextStyle(
+                                  fontFamily: 'Poppins', fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textPrimary),
+                              ),
+                              if (attr.isRequired)
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 4),
+                                  child: Text('*',
+                                    style: TextStyle(color: AppColors.error)),
+                                ),
+                            ]),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8, runSpacing: 8,
+                              children: attr.values.map((v) {
+                                final adj = v.priceAdj;
+                                final label = adj > 0
+                                    ? '${v.label.isNotEmpty ? v.label : v.value}  +₹${adj.toStringAsFixed(0)}'
+                                    : (v.label.isNotEmpty ? v.label : v.value);
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF7F7F7),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                        color: const Color(0xFFE5E5E5)),
+                                  ),
+                                  child: Text(label,
+                                    style: const TextStyle(
+                                      fontFamily: 'Poppins', fontSize: 12,
+                                      color: AppColors.textPrimary)),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        ),
+                      )).toList(),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),

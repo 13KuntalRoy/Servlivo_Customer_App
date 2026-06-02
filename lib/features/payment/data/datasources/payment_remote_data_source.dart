@@ -7,7 +7,6 @@ abstract class PaymentRemoteDataSource {
   Future<Map<String, dynamic>> initiatePayment(String bookingId);
   Future<Map<String, dynamic>> verifyPayment(Map<String, dynamic> body);
   Future<List<Map<String, dynamic>>> getTransactions();
-  Future<Map<String, dynamic>> requestRefund(String paymentId);
 }
 
 class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
@@ -45,16 +44,6 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
       return list.cast<Map<String, dynamic>>();
     } on DioException catch (e) {
       _handleError(e, 'Failed to load transactions');
-    }
-  }
-
-  @override
-  Future<Map<String, dynamic>> requestRefund(String paymentId) async {
-    try {
-      final response = await dio.post('${Endpoints.refund}/$paymentId');
-      return response.data as Map<String, dynamic>;
-    } on DioException catch (e) {
-      _handleError(e, 'Refund request failed');
     }
   }
 

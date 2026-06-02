@@ -55,14 +55,4 @@ class PaymentRepositoryImpl implements PaymentRepository {
     }
   }
 
-  @override
-  Future<Either<Failure, PaymentEntity>> requestRefund(String paymentId) async {
-    if (!await networkInfo.isConnected) return const Left(NetworkFailure('No internet'));
-    try {
-      final data = await remote.requestRefund(paymentId);
-      return Right(PaymentModel.fromJson(data));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    }
-  }
 }

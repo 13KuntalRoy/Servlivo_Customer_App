@@ -12,6 +12,7 @@ import '../../features/auth/data/datasources/auth_remote_data_source.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/forgot_password_usecase.dart';
+import '../../features/auth/domain/usecases/get_current_user_usecase.dart';
 import '../../features/auth/domain/usecases/login_usecase.dart';
 import '../../features/auth/domain/usecases/logout_usecase.dart';
 import '../../features/auth/domain/usecases/register_usecase.dart';
@@ -50,8 +51,8 @@ import '../../features/catalog/domain/usecases/get_categories_usecase.dart';
 import '../../features/catalog/domain/usecases/get_subcategories_usecase.dart';
 import '../../features/catalog/domain/usecases/get_services_usecase.dart';
 import '../../features/catalog/domain/usecases/get_service_detail_usecase.dart';
+import '../../features/catalog/domain/usecases/get_service_attributes_usecase.dart';
 import '../../features/catalog/domain/usecases/search_services_usecase.dart';
-import '../../features/catalog/domain/usecases/get_availability_usecase.dart';
 import '../../features/catalog/presentation/cubit/catalog_cubit.dart';
 
 // Booking
@@ -174,6 +175,7 @@ void _registerAuth() {
   sl.registerLazySingleton(() => ResetPasswordUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => SendPhoneOtpUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => VerifyPhoneOtpUseCase(sl<AuthRepository>()));
+  sl.registerLazySingleton(() => GetCurrentUserUseCase(sl<AuthRepository>()));
   // AuthBloc is singleton — router guard reads it at startup
   sl.registerSingleton<AuthBloc>(
     AuthBloc(
@@ -186,6 +188,7 @@ void _registerAuth() {
       resetPassword: sl<ResetPasswordUseCase>(),
       sendPhoneOtp: sl<SendPhoneOtpUseCase>(),
       verifyPhoneOtp: sl<VerifyPhoneOtpUseCase>(),
+      getCurrentUser: sl<GetCurrentUserUseCase>(),
       storage: sl<SecureStorageService>(),
     ),
   );
@@ -253,16 +256,16 @@ void _registerCatalog() {
   sl.registerLazySingleton(() => GetSubcategoriesUseCase(sl<CatalogRepository>()));
   sl.registerLazySingleton(() => GetServicesUseCase(sl<CatalogRepository>()));
   sl.registerLazySingleton(() => GetServiceDetailUseCase(sl<CatalogRepository>()));
+  sl.registerLazySingleton(() => GetServiceAttributesUseCase(sl<CatalogRepository>()));
   sl.registerLazySingleton(() => SearchServicesUseCase(sl<CatalogRepository>()));
-  sl.registerLazySingleton(() => GetAvailabilityUseCase(sl<CatalogRepository>()));
   sl.registerFactory<CatalogCubit>(
     () => CatalogCubit(
       getCategories: sl<GetCategoriesUseCase>(),
       getSubcategories: sl<GetSubcategoriesUseCase>(),
       getServices: sl<GetServicesUseCase>(),
       getServiceDetail: sl<GetServiceDetailUseCase>(),
+      getServiceAttributes: sl<GetServiceAttributesUseCase>(),
       searchServices: sl<SearchServicesUseCase>(),
-      getAvailability: sl<GetAvailabilityUseCase>(),
     ),
   );
 }

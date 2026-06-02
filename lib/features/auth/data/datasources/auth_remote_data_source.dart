@@ -44,6 +44,9 @@ abstract interface class AuthRemoteDataSource {
     required String otp,
     String? name,
   });
+
+  /// Fetches the authenticated user's profile (GET /users/profile).
+  Future<Map<String, dynamic>> getProfile();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -178,6 +181,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           if (name != null && name.isNotEmpty) 'name': name,
         },
       );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      _handleDioError(e);
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> getProfile() async {
+    try {
+      final response = await _dio.get(Endpoints.profile);
       return response.data as Map<String, dynamic>;
     } on DioException catch (e) {
       _handleDioError(e);

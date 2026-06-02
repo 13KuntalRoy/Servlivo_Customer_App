@@ -35,7 +35,7 @@ android {
         targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        manifestPlaceholders["MAPS_API_KEY"] = localProperties.getProperty("MAPS_API_KEY", "")
+        // Maps use OpenStreetMap (flutter_map) — no Google Maps API key needed.
     }
 
     buildTypes {
